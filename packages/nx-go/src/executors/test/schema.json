@@ -1,9 +1,42 @@
 {
-  "$schema": "http://json-schema.org/schema",
-  "cli": "nx",
+  "$schema": "https://json-schema.org/schema",
+  "version": 2,
   "title": "Test executor",
-  "description": "",
+  "description": "Tests Go code using the `go test` command",
   "type": "object",
-  "properties": {},
+  "properties": {
+    "cover": {
+      "description": "Whether to enable coverage analysis",
+      "type": "boolean",
+      "default": false
+    },
+    "coverProfile": {
+      "description": "Write a coverage profile to the file after all tests have passed",
+      "type": "string",
+      "x-completion-type": "file"
+    },
+    "race": {
+      "description": "Whether to enable race detector",
+      "type": "boolean",
+      "default": false
+    },
+    "run": {
+      "description": "Run only tests matching this regular expression",
+      "type": "string"
+    },
+    "verbose": {
+      "description": "Whether to enable verbose test output",
+      "type": "boolean",
+      "default": false
+    },
+    "count": {
+      "description": "Run each test $N times matching this count",
+      "type": "number"
+    },
+    "timeout": {
+      "description": "If a test binary runs longer than duration d, panic.\nIf d is 0, the timeout is disabled.\nThe default is 10 minutes (10m).",
+      "type": "string"
+    }
+  },
   "required": []
 }

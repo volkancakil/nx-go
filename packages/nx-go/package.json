@@ -1,15 +1,32 @@
 {
   "name": "@nx-go/nx-go",
-  "version": "2.2.0",
-  "main": "src/index.js",
-  "generators": "./generators.json",
-  "executors": "./executors.json",
+  "version": "3.3.1",
+  "description": "Nx plugin to use Go in a Nx Workspace",
+  "license": "MIT",
   "homepage": "https://github.com/nx-go/nx-go",
+  "keywords": [
+    "go",
+    "nx",
+    "nx-plugin"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nx-go/nx-go.git",
+    "directory": "packages/nx-go"
+  },
   "bugs": {
     "url": "https://github.com/nx-go/nx-go/issues"
   },
   "dependencies": {
-    "fs-extra": "^9.1.0"
+    "@nx/devkit": ">= 17 < 21",
+    "tslib": "^2.3.0"
   },
-  "license": "MIT"
+  "type": "commonjs",
+  "main": "./src/index.js",
+  "typings": "./src/index.d.ts",
+  "executors": "./executors.json",
+  "generators": "./generators.json",
+  "nx-migrations": {
+    "migrations": "./migrations.json"
+  }
 }

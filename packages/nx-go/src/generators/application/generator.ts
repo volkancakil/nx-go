@@ -1,42 +1,75 @@
-import { addProjectConfiguration, formatFiles, getWorkspaceLayout, Tree } from '@nrwl/devkit'
-import { join, normalize } from 'path'
-import { addFiles, createGoMod, normalizeOptions } from '../../utils'
-import { ApplicationGeneratorSchema } from './schema'
+import {
+  addProjectConfiguration,
+  formatFiles,
+  generateFiles,
+  ProjectConfiguration,
+  TargetConfiguration,
+  Tree,
+  updateProjectConfiguration,
+} from '@nx/devkit';
+import { join } from 'path';
+import {
+  addGoWorkDependency,
+  createGoMod,
+  isGoWorkspace,
+  normalizeOptions,
+} from '../../utils';
+import type { ApplicationGeneratorSchema } from './schema';
 
-export default async function (tree: Tree, options: ApplicationGeneratorSchema) {
-  const normalizedOptions = normalizeOptions(tree, getWorkspaceLayout(tree).appsDir, options)
-  const sourceRoot = normalizedOptions.projectRoot
+export const defaultTargets: { [targetName: string]: TargetConfiguration } = {
+  build: {
+    executor: '@nx-go/nx-go:build',
+    options: {
+      main: '{projectRoot}/main.go',
+    },
+  },
+  serve: {
+    executor: '@nx-go/nx-go:serve',
+    options: {
+      main: '{projectRoot}/main.go',
+    },
+  },
+  test: {
+    executor: '@nx-go/nx-go:test',
+  },
+  lint: {
+    executor: '@nx-go/nx-go:lint',
+  },
+};
 
-  const targetOptions = {
-    outputPath: join(normalize('dist'), sourceRoot),
-    main: join(sourceRoot, 'main.go'),
+export default async function applicationGenerator(
+  tree: Tree,
+  schema: ApplicationGeneratorSchema
+) {
+  const options = await normalizeOptions(
+    tree,
+    schema,
+    'application',
+    '@nx-go/nx-go:application'
+  );
+  const projectConfiguration: ProjectConfiguration = {
+    root: options.projectRoot,
+    name: options.projectName,
+    projectType: options.projectType,
+    sourceRoot: options.projectRoot,
+    tags: options.parsedTags,
+    targets: defaultTargets,
+  };
+
+  addProjectConfiguration(tree, options.name, projectConfiguration);
+
+  generateFiles(tree, join(__dirname, 'files'), options.projectRoot, options);
+
+  if (isGoWorkspace(tree)) {
+    createGoMod(tree, options.projectRoot, options.projectRoot);
+    addGoWorkDependency(tree, options.projectRoot);
+    projectConfiguration.targets.tidy = {
+      executor: '@nx-go/nx-go:tidy',
+    };
+    updateProjectConfiguration(tree, options.name, projectConfiguration);
   }
 
-  addProjectConfiguration(tree, normalizedOptions.projectName, {
-    root: sourceRoot,
-    projectType: 'application',
-    sourceRoot,
-    targets: {
-      build: {
-        executor: '@nx-go/nx-go:build',
-        options: targetOptions,
-      },
-      serve: {
-        executor: '@nx-go/nx-go:serve',
-        options: {
-          main: join(sourceRoot, 'main.go'),
-        },
-      },
-      test: {
-        executor: '@nx-go/nx-go:test',
-      },
-      lint: {
-        executor: '@nx-go/nx-go:lint',
-      },
-    },
-    tags: normalizedOptions.parsedTags,
-  })
-  addFiles(tree, join(__dirname, 'files'), normalizedOptions)
-  createGoMod(tree, normalizedOptions)
-  await formatFiles(tree)
+  if (!options.skipFormat) {
+    await formatFiles(tree);
+  }
 }

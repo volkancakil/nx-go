@@ -1,25 +1,34 @@
 {
-  "$schema": "http://json-schema.org/schema",
   "executors": {
     "build": {
       "implementation": "./src/executors/build/executor",
       "schema": "./src/executors/build/schema.json",
-      "description": "build executor"
+      "description": "Build the executable of a Go program"
     },
-    "test": {
-      "implementation": "./src/executors/test/executor",
-      "schema": "./src/executors/test/schema.json",
-      "description": "test executor"
+    "generate": {
+      "implementation": "./src/executors/generate/executor",
+      "schema": "./src/executors/generate/schema.json",
+      "description": "Run a tool using Go generate"
     },
     "lint": {
       "implementation": "./src/executors/lint/executor",
       "schema": "./src/executors/lint/schema.json",
-      "description": "lint executor"
+      "description": "Lint a Go program"
+    },
+    "tidy": {
+      "implementation": "./src/executors/tidy/executor",
+      "schema": "./src/executors/tidy/schema.json",
+      "description": "Tidy the mod file of the application or library"
     },
     "serve": {
       "implementation": "./src/executors/serve/executor",
       "schema": "./src/executors/serve/schema.json",
-      "description": "serve executor"
+      "description": "Run a Go program"
+    },
+    "test": {
+      "implementation": "./src/executors/test/executor",
+      "schema": "./src/executors/test/schema.json",
+      "description": "Test a Go program"
     }
   }
 }

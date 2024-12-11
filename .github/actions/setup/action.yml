@@ -1,0 +1,38 @@
+name: setup
+description: Setup Node, Go and install dependencies
+
+inputs:
+  node_version:
+    description: Node Version
+    required: true
+  go_version:
+    description: Go Version
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Derive appropriate SHAs for base and head for `nx affected` commands
+      uses: nrwl/nx-set-shas@v3
+
+    - name: Use Go ${{ inputs.go_version }}
+      uses: actions/setup-go@v5
+      with:
+        cache: false # we do not install Go modules, so we do not need to cache them
+        go-version: ${{ inputs.go_version }}
+
+    - name: Use pnpm
+      uses: pnpm/action-setup@v4.0.0
+      with:
+        run_install: false
+
+    - name: Use Node.js ${{ inputs.node_version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ inputs.node_version }}
+        registry-url: 'https://registry.npmjs.org'
+        cache: 'pnpm'
+
+    - name: Install dependencies
+      shell: bash
+      run: pnpm install --frozen-lockfile --strict-peer-dependencies

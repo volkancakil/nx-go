@@ -1,24 +1,52 @@
-import { TestExecutorSchema } from './schema'
-import executor from './executor'
+import type { ExecutorContext } from '@nx/devkit';
+import * as commonFunctions from '../../utils';
+import executor from './executor';
+import type { TestExecutorSchema } from './schema';
 
-jest.mock('../../utils')
-import * as utils from '../../utils'
+jest.mock('../../utils', () => {
+  const { buildFlagIfEnabled, buildStringFlagIfValid } =
+    jest.requireActual('../../utils');
+  return {
+    buildFlagIfEnabled,
+    buildStringFlagIfValid,
+    executeCommand: jest.fn().mockResolvedValue({ success: true }),
+    extractProjectRoot: jest.fn(() => 'apps/project'),
+  };
+});
 
-const options: TestExecutorSchema = {}
+const options: TestExecutorSchema = {};
+
+const context: ExecutorContext = {
+  cwd: 'current-dir',
+  root: '',
+  isVerbose: false,
+};
 
 describe('Test Executor', () => {
-  beforeEach(async () => {
-    // Mocks the runGoCommand
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    ;(utils as any).runGoCommand = jest.fn().mockReturnValue({
-      success: true,
-    })
-  })
+  it('should execute test of a go project with default options', async () => {
+    const spyExecute = jest.spyOn(commonFunctions, 'executeCommand');
+    const output = await executor(options, context);
+    expect(output.success).toBeTruthy();
+    expect(spyExecute).toHaveBeenCalledWith(['test', './...'], {
+      cwd: 'apps/project',
+    });
+  });
 
-  afterEach(() => jest.clearAllMocks())
-
-  it('can run', async () => {
-    const output = await executor(options, null)
-    expect(output.success).toBe(true)
-  })
-})
+  it.each`
+    config                              | flag
+    ${{ verbose: true }}                | ${'-v'}
+    ${{ cover: true }}                  | ${'-cover'}
+    ${{ coverProfile: 'coverage.out' }} | ${'-coverprofile=coverage.out'}
+    ${{ race: true }}                   | ${'-race'}
+    ${{ run: 'TestProjection' }}        | ${'-run=TestProjection'}
+    ${{ count: 1 }}                     | ${'-count=1'}
+    ${{ timeout: '10m' }}               | ${'-timeout=10m'}
+  `('should add flag $flag if enabled', async ({ config, flag }) => {
+    const spyExecute = jest.spyOn(commonFunctions, 'executeCommand');
+    const output = await executor({ ...options, ...config }, context);
+    expect(output.success).toBeTruthy();
+    expect(spyExecute).toHaveBeenCalledWith(expect.arrayContaining([flag]), {
+      cwd: 'apps/project',
+    });
+  });
+});

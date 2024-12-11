@@ -1,9 +1,21 @@
 {
-  "$schema": "http://json-schema.org/schema",
-  "cli": "nx",
+  "$schema": "https://json-schema.org/schema",
+  "version": 2,
   "title": "Lint executor",
-  "description": "",
+  "description": "Lints Go code using the `go fmt` command",
   "type": "object",
-  "properties": {},
+  "properties": {
+    "linter": {
+      "type": "string",
+      "description": "The command to execute when running the lint executor."
+    },
+    "args": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Extra args when linting the app"
+    }
+  },
   "required": []
 }

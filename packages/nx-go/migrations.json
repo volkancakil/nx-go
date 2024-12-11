@@ -1,0 +1,29 @@
+{
+  "generators": {
+    "add-nx-go-plugin": {
+      "version": "3.0.0-beta.0",
+      "description": "Add Nx Go plugin to Nx workspace configuration",
+      "implementation": "./src/migrations/update-3.0.0/add-nx-go-plugin"
+    },
+    "add-go-config-in-shared-globals": {
+      "version": "3.0.0-beta.0",
+      "description": "Add Go config in shared globals",
+      "implementation": "./src/migrations/update-3.0.0/add-go-config-in-shared-globals"
+    },
+    "update-executors-options": {
+      "version": "3.0.0-beta.1",
+      "description": "Update options to match new schema of executors",
+      "implementation": "./src/migrations/update-3.0.0/update-executors-options"
+    },
+    "add-tidy-targets": {
+      "version": "3.1.0",
+      "description": "Add tidy target to libraries and applications",
+      "implementation": "./src/migrations/update-3.1.0/add-tidy-target-to-libraries-and-applications"
+    },
+    "replace-run-commands-with-generate-executor": {
+      "version": "3.2.0",
+      "description": "Use generate executor in projects using a \"run-commands\" target for generating code.",
+      "implementation": "./src/migrations/update-3.2.0/replace-run-commands-with-generate-executor"
+    }
+  }
+}
